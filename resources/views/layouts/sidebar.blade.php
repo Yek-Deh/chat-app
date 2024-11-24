@@ -33,7 +33,7 @@
                     <img src="{{asset('images/avatar.png')}}" alt="" />
                     <div class="meta">
                         <p class="name">{{$user->name}}</p>
-                        <p class="preview">You just got LITT up, Mike.</p>
+                        <p class="preview"></p>
                     </div>
                 </div>
             @empty

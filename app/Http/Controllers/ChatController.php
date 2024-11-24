@@ -14,6 +14,7 @@ class ChatController extends Controller
     function index()
     {
         $users = User::where('id', '!=', auth()->user()->id)->get();
+
         return view('dashboard', compact('users'));
     }
 

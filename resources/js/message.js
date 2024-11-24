@@ -7,19 +7,30 @@ function toggleLoader() {
     $('.loader').toggleClass('d-none');
 }
 
-function messageTemplate(text, className,time) {
+function messageTemplate(text, className, time) {
     return `<li class="${className}"><img src="${baseUrl}/images/avatar.png" alt=""/><p>${text}<sub>${time}</sub></p></li>`
 }
+
 function formatTime(createdAt) {
+    // const messageTime = new Date(createdAt);
+    // return messageTime.getHours().toString().padStart(2, '0') + ':' +
+    //     messageTime.getMinutes().toString().padStart(2, '0');
+
+    //with seconds
     const messageTime = new Date(createdAt);
-    return messageTime.getHours().toString().padStart(2, '0') + ':' +
-        messageTime.getMinutes().toString().padStart(2, '0');
+    const hours = messageTime.getHours().toString().padStart(2, '0');
+    const minutes = messageTime.getMinutes().toString().padStart(2, '0');
+    const seconds = messageTime.getSeconds().toString().padStart(2, '0');
+
+    return `${hours}:${minutes}:${seconds}`;
 }
+
 function scrollToLastMessage() {
     const messagesContainer = $('.messages');
     // Scroll to the last message by scrolling to the bottom of the container
     messagesContainer.scrollTop(messagesContainer[0].scrollHeight);
 }
+
 function fetchMessages() {
     let contactId = selectedContact.attr('content');
 
@@ -48,6 +59,7 @@ function fetchMessages() {
                     inbox.append(messageTemplate(value.message, 'replies', formattedTime));
                 }
             });
+            //  $('.preview').text(data.lastMessage);
             scrollToLastMessage();
         },
         error: function (xhr, status, error) {
@@ -70,8 +82,8 @@ function sendMessage() {
         beforeSend: function () {
             let message = messageBox.val();
             let time = new Date();
-            time=formatTime(time);
-            inbox.append(messageTemplate(message, 'replies',time));
+            time = formatTime(time);
+            inbox.append(messageTemplate(message, 'replies', time));
             messageBox.val('');
         },
         success: function (data) {
@@ -106,5 +118,8 @@ $(document).ready(function () {
 window.Echo.private('message.' + authId)
     .listen('SendMessageEvent', (e) => {
         const formattedTime = formatTime(e.time); // Format time
-       inbox.append(messageTemplate(e.text, 'sent',formattedTime));
+        if (e.from_id == selectedContact.attr('content')) {
+            inbox.append(messageTemplate(e.text, 'sent', formattedTime));
+        }
+
     });

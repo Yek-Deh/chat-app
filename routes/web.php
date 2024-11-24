@@ -3,6 +3,8 @@
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ProfileController;
 use App\Models\Message;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
@@ -26,4 +28,8 @@ require __DIR__.'/auth.php';
 Route::get('/dal',function (){
     DB::table('messages')->truncate();
     return back();
+});
+
+Route::get('us',function (){
+
 });
