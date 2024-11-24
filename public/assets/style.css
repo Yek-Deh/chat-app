@@ -644,9 +644,9 @@ body {
 }
 
 #frame .content .messages {
-    height: auto;
-    min-height: calc(100% - 93px);
-    max-height: calc(100% - 93px);
+    /*height: 78%;*/
+    /*min-height: calc(100% - 93px);*/
+    max-height: calc(100% - 120px);
     width: 100%;
 
     overflow-y: scroll;
@@ -689,6 +689,10 @@ body {
     background: #435f7a;
     color: #f5f5f5;
 }
+#frame .content .messages ul li.sent p sub {
+    color: #f5f5f5;
+    margin: 15px;
+}
 
 #frame .content .messages ul li.replies img {
     float: right;
@@ -697,8 +701,12 @@ body {
 
 #frame .content .messages ul li.replies p {
     background: #c6c185;
+    color: rgba(16, 16, 16, 0.95);
     float: right;
-}
+}#frame .content .messages ul li.replies p sub {
+     color: rgba(16, 16, 16, 0.95);
+     margin: 15px;
+ }
 
 #frame .content .messages ul li img {
     width: 22px;

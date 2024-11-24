@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\SendMessageEvent;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -22,7 +23,7 @@ class ChatController extends Controller
         $messages =Message::where('from_id',Auth::user()->id)->where('to_id',$contact->id)->orWhere('from_id',$contact->id)->where('to_id',Auth::user()->id)->get();
         return response()->json([
             'contact' => $contact,
-            'messages' => $messages
+            'messages' => $messages,
         ]);
     }
 
@@ -38,6 +39,9 @@ class ChatController extends Controller
         $message->to_id = $request->contact_id;
         $message->message = $request->message;
         $message->save();
+        $time=$message->created_at;
+
+        event(new SendMessageEvent($message->message,Auth::user()->id,$request->contact_id,$time));
         return response($message);
 
     }

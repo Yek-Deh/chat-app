@@ -1,4 +1,5 @@
 const selectedContact = $('meta[name="selected_contact"]');
+const authId = $('meta[name="auth_id"]').attr('content');
 const baseUrl = $('meta[name="base_url"]').attr('content');
 const inbox = $('.messages ul');
 
@@ -6,10 +7,19 @@ function toggleLoader() {
     $('.loader').toggleClass('d-none');
 }
 
-function messageTemplate(text,className) {
-    return `<li class="${className}"><img src="${baseUrl}/images/avatar.png" alt=""/> <p>${text}</p></li>`
+function messageTemplate(text, className,time) {
+    return `<li class="${className}"><img src="${baseUrl}/images/avatar.png" alt=""/><p>${text}<sub>${time}</sub></p></li>`
 }
-
+function formatTime(createdAt) {
+    const messageTime = new Date(createdAt);
+    return messageTime.getHours().toString().padStart(2, '0') + ':' +
+        messageTime.getMinutes().toString().padStart(2, '0');
+}
+function scrollToLastMessage() {
+    const messagesContainer = $('.messages');
+    // Scroll to the last message by scrolling to the bottom of the container
+    messagesContainer.scrollTop(messagesContainer[0].scrollHeight);
+}
 function fetchMessages() {
     let contactId = selectedContact.attr('content');
 
@@ -26,13 +36,19 @@ function fetchMessages() {
             setContactInfo(data.contact);
             //append messages
             inbox.empty();
+            // Function to format the time as "H:i"
+
             data.messages.forEach(value => {
-                if (value.from_id == contactId){
-                inbox.append(messageTemplate(value.message,'sent'));
-                }else {
-                    inbox.append(messageTemplate(value.message,'replies'));
+                const formattedTime = formatTime(value.created_at); // Format time
+                if (value.from_id == contactId) {
+
+                    inbox.append(messageTemplate(value.message, 'sent', formattedTime));
+                } else {
+                    // let time=value.created_at.format('H:i');
+                    inbox.append(messageTemplate(value.message, 'replies', formattedTime));
                 }
             });
+            scrollToLastMessage();
         },
         error: function (xhr, status, error) {
         },
@@ -53,7 +69,9 @@ function sendMessage() {
         data: formData + '&contact_id= ' + contactId,
         beforeSend: function () {
             let message = messageBox.val();
-            inbox.append(messageTemplate(message,'replies'));
+            let time = new Date();
+            time=formatTime(time);
+            inbox.append(messageTemplate(message, 'replies',time));
             messageBox.val('');
         },
         success: function (data) {
@@ -61,6 +79,7 @@ function sendMessage() {
         error: function (xhr, status, error) {
         }
     })
+    scrollToLastMessage();
 }
 
 function setContactInfo(contact) {
@@ -82,3 +101,10 @@ $(document).ready(function () {
         sendMessage();
     })
 });
+
+//listen to the live events
+window.Echo.private('message.' + authId)
+    .listen('SendMessageEvent', (e) => {
+        const formattedTime = formatTime(e.time); // Format time
+       inbox.append(messageTemplate(e.text, 'sent',formattedTime));
+    });
