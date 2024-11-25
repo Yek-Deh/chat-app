@@ -29,13 +29,14 @@
             @forelse($users as $user)
             <li class="contact" data-id="{{$user->id}}">
                 <div class="wrap">
-                    <span class="contact-status online"></span>
+                    <span class="contact-status offline"></span>
                     <img src="{{asset('images/avatar.png')}}" alt="" />
                     <div class="meta">
                         <p class="name">{{$user->name}}</p>
                         <p class="preview" data-user-id="{{$user->id}}">{{$userMessages[$user->id]}}</p>
                     </div>
                 </div>
+            </li>
             @empty
                 <p class="text-center">No users found</p>
 

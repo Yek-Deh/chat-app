@@ -83,8 +83,8 @@ function sendMessage() {
             let time = new Date();
             time = formatTime(time);
             inbox.append(messageTemplate(message, 'replies', time));
-            updatePreviewMessage(contactId,message);
-            scrollToLastMessage(contactId,message);
+            updatePreviewMessage(contactId, message);
+            scrollToLastMessage(contactId, message);
             messageBox.val('');
         },
         success: function (data) {
@@ -95,6 +95,18 @@ function sendMessage() {
 
 }
 
+//show the last message in sidebar name section
+function updatePreviewMessage(userId, messageText) {
+    // Find the preview element with the specific user ID
+    const previewElement = document.querySelector('.preview[data-user-id="' + userId + '"]');
+
+    if (previewElement) {
+        // Update the preview text
+        previewElement.textContent = messageText;
+    }
+}
+
+//set name in message section
 function setContactInfo(contact) {
     $('.contact-name').text(contact.name);
 }
@@ -115,11 +127,6 @@ $(document).ready(function () {
     })
 });
 
-function latestMessage(text){
-    $('.preview').text(text);
-    console.log(text);
-
-}
 //listen to the live events
 window.Echo.private('message.' + authId)
     .listen('SendMessageEvent', (e) => {
@@ -130,12 +137,29 @@ window.Echo.private('message.' + authId)
         }
         updatePreviewMessage(e.from_id, e.text);  // Update preview for sender
     });
-function updatePreviewMessage(userId, messageText) {
-    // Find the preview element with the specific user ID
-    const previewElement = document.querySelector('.preview[data-user-id="' + userId + '"]');
+window.Echo.join('online')
+    .here(users => {
+        users.forEach(user =>{
+      let element= $(`.contact[data-id="${user.id}"]`);
+      if (element.length >0){
+          element.find('.contact-status').removeClass('offline');
+          element.find('.contact-status').addClass('online');
+      }else {
+          element.find('.contact-status').removeClass('online');
+          element.find('.contact-status').addClass('offline');
+      }
+        })
 
-    if (previewElement) {
-        // Update the preview text
-        previewElement.textContent = messageText;
-    }
-}
+
+    })
+    .joining(user => {
+        let element= $(`.contact[data-id="${user.id}"]`);
+        element.find('.contact-status').removeClass('offline');
+        element.find('.contact-status').addClass('online');
+    })
+    .leaving(user => {
+        let element= $(`.contact[data-id="${user.id}"]`);
+        element.find('.contact-status').removeClass('online');
+        element.find('.contact-status').addClass('offline');
+    })
+
