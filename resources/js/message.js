@@ -59,7 +59,6 @@ function fetchMessages() {
                     inbox.append(messageTemplate(value.message, 'replies', formattedTime));
                 }
             });
-            //  $('.preview').text(data.lastMessage);
             scrollToLastMessage();
         },
         error: function (xhr, status, error) {
@@ -84,6 +83,8 @@ function sendMessage() {
             let time = new Date();
             time = formatTime(time);
             inbox.append(messageTemplate(message, 'replies', time));
+            updatePreviewMessage(contactId,message);
+            scrollToLastMessage(contactId,message);
             messageBox.val('');
         },
         success: function (data) {
@@ -91,7 +92,7 @@ function sendMessage() {
         error: function (xhr, status, error) {
         }
     })
-    scrollToLastMessage();
+
 }
 
 function setContactInfo(contact) {
@@ -114,12 +115,27 @@ $(document).ready(function () {
     })
 });
 
+function latestMessage(text){
+    $('.preview').text(text);
+    console.log(text);
+
+}
 //listen to the live events
 window.Echo.private('message.' + authId)
     .listen('SendMessageEvent', (e) => {
         const formattedTime = formatTime(e.time); // Format time
         if (e.from_id == selectedContact.attr('content')) {
             inbox.append(messageTemplate(e.text, 'sent', formattedTime));
+            scrollToLastMessage();
         }
-
+        updatePreviewMessage(e.from_id, e.text);  // Update preview for sender
     });
+function updatePreviewMessage(userId, messageText) {
+    // Find the preview element with the specific user ID
+    const previewElement = document.querySelector('.preview[data-user-id="' + userId + '"]');
+
+    if (previewElement) {
+        // Update the preview text
+        previewElement.textContent = messageText;
+    }
+}

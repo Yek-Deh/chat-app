@@ -11,20 +11,35 @@ use Illuminate\Support\Facades\Auth;
 class ChatController extends Controller
 {
     //
+    function getLastMessages($userId)
+    {
+        return Message::where('from_id', Auth::id())
+            ->where('to_id', $userId)->orWhere('from_id', $userId)->where('to_id',Auth::id())
+            ->latest()  // Orders by 'created_at' in descending order (most recent first)
+            ->first(); // Gets only the most recent (first) record
+    }
     function index()
     {
-        $users = User::where('id', '!=', auth()->user()->id)->get();
 
-        return view('dashboard', compact('users'));
+        $users = User::where('id', '!=', Auth::id())->get();
+        $userMessages = [];
+        foreach ($users as $user) {
+            $message = $this->getLastMessages($user->id);
+            $userMessages[$user->id] = $message ? $message->message:'no message';
+        }
+
+        return view('dashboard', compact('users', 'userMessages'));
     }
 
     function fetchMessages(Request $request)
     {
         $contact = User::findOrFail($request->get('contact_id'));
         $messages =Message::where('from_id',Auth::user()->id)->where('to_id',$contact->id)->orWhere('from_id',$contact->id)->where('to_id',Auth::user()->id)->get();
+//        $latestMessage = $messages->last();
         return response()->json([
             'contact' => $contact,
             'messages' => $messages,
+//            'latestMessage' => $latestMessage ? $latestMessage->message:'no message',
         ]);
     }
 

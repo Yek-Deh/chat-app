@@ -77,7 +77,7 @@ body {
     -o-transform: scaleY(-1);
     -webkit-transform: scaleY(-1);
     transform: scaleY(-1);
-    filter: FlipH;
+    /*filter: FlipH;*/
     -ms-filter: "FlipH";
 }
 
@@ -644,11 +644,10 @@ body {
 }
 
 #frame .content .messages {
-    /*height: 78%;*/
-    /*min-height: calc(100% - 93px);*/
+    height: auto;
+    min-height: calc(100% - 120px);
     max-height: calc(100% - 120px);
     width: 100%;
-
     overflow-y: scroll;
     overflow-x: hidden;
 }

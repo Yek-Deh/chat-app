@@ -33,7 +33,7 @@
                     <img src="{{asset('images/avatar.png')}}" alt="" />
                     <div class="meta">
                         <p class="name">{{$user->name}}</p>
-                        <p class="preview"></p>
+                        <p class="preview" data-user-id="{{$user->id}}">{{$userMessages[$user->id]}}</p>
                     </div>
                 </div>
             @empty

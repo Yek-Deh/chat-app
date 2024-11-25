@@ -29,7 +29,3 @@ Route::get('/dal',function (){
     DB::table('messages')->truncate();
     return back();
 });
-
-Route::get('us',function (){
-
-});
